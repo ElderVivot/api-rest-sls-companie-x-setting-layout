@@ -1,0 +1,69 @@
+service: api-rest-sls-CompanieXSettingLayout
+frameworkVersion: '3'
+
+custom:
+  tableName: companie-x-setting-layout
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: prod
+  region: us-east-2
+  memorySize: 128
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ CompanieXSettingLayoutTable, Arn ]
+  environment:
+    TABLE_NAME: ${self:custom.tableName}
+
+functions:
+  get:
+    handler: src/get.GetData
+    events:
+      - httpApi:
+          path: /v1/companie-x-setting-layout
+          method: get
+  put:
+    handler: src/put.PutData
+    events:
+      - httpApi:
+          path: /v1/companie-x-setting-layout
+          method: put
+  delete:
+    handler: src/delete.DeleteData
+    events:
+      - httpApi:
+          path: /v1/companie-x-setting-layout/{id}
+          method: delete
+  getOne:
+    handler: src/get.GetData
+    events:
+      - httpApi:
+          path: /v1/companie-x-setting-layout/{id}
+          method: get
+
+resources:
+  Resources:
+    CompanieXSettingLayoutTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.tableName}

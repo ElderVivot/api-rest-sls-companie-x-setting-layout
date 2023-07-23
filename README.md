@@ -1,0 +1,1 @@
+# Serverless Framework Node HTTP API on AWS wit Lamda Functions and DynamoDB
